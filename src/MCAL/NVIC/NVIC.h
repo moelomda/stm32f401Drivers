@@ -1,21 +1,24 @@
-/*
- * NVIC.h
- *
- *  Created on: ???/???/????
- *      Author: Mohamed Elomda
- */
 #ifndef NVIC_H_
 #define NVIC_H_
 
 #include "Stm32F401C_Interrupts.h"
 #include "std_types.h"
 
-#define IRQ_ENABLE    1
-#define IRQ_DISABLE  0
-#define SET_PENDING    1
-#define CLR_PENDING    0
-#define INT_ACTIVE     1
-#define INT_NACTIVE    0
+#define IRQ_ENABLE     1    // Enable IRQ
+#define IRQ_DISABLE    0    // Disable IRQ
+#define SET_PENDING    1    // Set interrupt as pending
+#define CLR_PENDING    0    // Clear pending interrupt
+#define INT_ACTIVE     1    // Interrupt active
+#define INT_NACTIVE    0    // Interrupt not active
+
+
+#define NVIC_PRIORITYGROUP_16_NONE    (0x0UL << 8)  // None bits group, 16 bits subpriority
+#define NVIC_PRIORITYGROUP_8_2        (0x4UL << 8)  // 8 bits group, 2 bits subpriority
+#define NVIC_PRIORITYGROUP_4_4        (0x5UL << 8)  // 4 bits group, 4 bits subpriority
+#define NVIC_PRIORITYGROUP_2_8        (0x6UL << 8)  // 2 bits group, 8 bits subpriority
+#define NVIC_PRIORITYGROUP_NONE_16    (0x7UL << 8)  // None bits group, 16 bits subpriority
+
+
 
 #define PRIORITY_0     0
 #define PRIORITY_1     1
@@ -145,134 +148,24 @@
 #define PRIORITY_125   125
 #define PRIORITY_126   126
 #define PRIORITY_127   127
-#define PRIORITY_128   128
-#define PRIORITY_129   129
-#define PRIORITY_130   130
-#define PRIORITY_131   131
-#define PRIORITY_132   132
-#define PRIORITY_133   133
-#define PRIORITY_134   134
-#define PRIORITY_135   135
-#define PRIORITY_136   136
-#define PRIORITY_137   137
-#define PRIORITY_138   138
-#define PRIORITY_139   139
-#define PRIORITY_140   140
-#define PRIORITY_141   141
-#define PRIORITY_142   142
-#define PRIORITY_143   143
-#define PRIORITY_144   144
-#define PRIORITY_145   145
-#define PRIORITY_146   146
-#define PRIORITY_147   147
-#define PRIORITY_148   148
-#define PRIORITY_149   149
-#define PRIORITY_150   150
-#define PRIORITY_151   151
-#define PRIORITY_152   152
-#define PRIORITY_153   153
-#define PRIORITY_154   154
-#define PRIORITY_155   155
-#define PRIORITY_156   156
-#define PRIORITY_157   157
-#define PRIORITY_158   158
-#define PRIORITY_159   159
-#define PRIORITY_160   160
-#define PRIORITY_161   161
-#define PRIORITY_162   162
-#define PRIORITY_163   163
-#define PRIORITY_164   164
-#define PRIORITY_165   165
-#define PRIORITY_166   166
-#define PRIORITY_167   167
-#define PRIORITY_168   168
-#define PRIORITY_169   169
-#define PRIORITY_170   170
-#define PRIORITY_171   171
-#define PRIORITY_172   172
-#define PRIORITY_173   173
-#define PRIORITY_174   174
-#define PRIORITY_175   175
-#define PRIORITY_176   176
-#define PRIORITY_177   177
-#define PRIORITY_178   178
-#define PRIORITY_179   179
-#define PRIORITY_180   180
-#define PRIORITY_181   181
-#define PRIORITY_182   182
-#define PRIORITY_183   183
-#define PRIORITY_184   184
-#define PRIORITY_185   185
-#define PRIORITY_186   186
-#define PRIORITY_187   187
-#define PRIORITY_188   188
-#define PRIORITY_189   189
-#define PRIORITY_190   190
-#define PRIORITY_191   191
-#define PRIORITY_192   192
-#define PRIORITY_193   193
-#define PRIORITY_194   194
-#define PRIORITY_195   195
-#define PRIORITY_196   196
-#define PRIORITY_197   197
-#define PRIORITY_198   198
-#define PRIORITY_199   199
-#define PRIORITY_200   200
-#define PRIORITY_201   201
-#define PRIORITY_202   202
-#define PRIORITY_203   203
-#define PRIORITY_204   204
-#define PRIORITY_205   205
-#define PRIORITY_206   206
-#define PRIORITY_207   207
-#define PRIORITY_208   208
-#define PRIORITY_209   209
-#define PRIORITY_210   210
-#define PRIORITY_211   211
-#define PRIORITY_212   212
-#define PRIORITY_213   213
-#define PRIORITY_214   214
-#define PRIORITY_215   215
-#define PRIORITY_216   216
-#define PRIORITY_217   217
-#define PRIORITY_218   218
-#define PRIORITY_219   219
-#define PRIORITY_220   220
-#define PRIORITY_221   221
-#define PRIORITY_222   222
-#define PRIORITY_223   223
-#define PRIORITY_224   224
-#define PRIORITY_225   225
-#define PRIORITY_226   226
-#define PRIORITY_227   227
-#define PRIORITY_228   228
-#define PRIORITY_229   229
-#define PRIORITY_230   230
-#define PRIORITY_231   231
-#define PRIORITY_232   232
-#define PRIORITY_233   233
-#define PRIORITY_234   234
-#define PRIORITY_235   235
-#define PRIORITY_236   236
-#define PRIORITY_237   237
-#define PRIORITY_238   238
-#define PRIORITY_239   239
-#define PRIORITY_240   240
-#define PRIORITY_241   241
-#define PRIORITY_242   242
-#define PRIORITY_243   243
-#define PRIORITY_244   244
-#define PRIORITY_245   245
-#define PRIORITY_246   246
-#define PRIORITY_247   247
-#define PRIORITY_248   248
-#define PRIORITY_249   249
-#define PRIORITY_250   250
-#define PRIORITY_251   251
-#define PRIORITY_252   252
-#define PRIORITY_253   253
-#define PRIORITY_254   254
-#define PRIORITY_255   255
+/**
+ * @brief   Enumeration for NVIC error status.
+ * @details This enumeration defines the possible error statuses that can occur
+ *          during NVIC (Nested Vector Interrupt Controller) configuration or usage.
+ *          - NVIC_enuInvalidIrq: Indicates an invalid IRQ number.
+ *          - NVIC_enuInvalidStatus: Indicates an invalid status or condition.
+ *          - NVIC_enuInvalidPriority: Indicates an invalid priority level.
+ *          - NVIC_enuNullPtr: Indicates a null pointer error.
+ *          - NVIC_enuInvalidGrouping: Indicates an invalid priority grouping configuration.
+ */
+typedef enum {
+    NVIC_enuInvalidIrq,
+    NVIC_enuInvalidStatus,
+    NVIC_enuInvalidPriority,
+    NVIC_enuNullPtr,
+    NVIC_enuInvalidGrouping,
+	NVIC_enuSuccesseded,
+} NVIC_enuErrorStatus_t;
 
 /**
  * @brief   Controls the specified interrupt in the NVIC.
@@ -280,24 +173,27 @@
  * @param   Copy_Status: The status to be set for the interrupt (enable/disable).
  * @note    This function provides control over the specified interrupt in the Nested Vector Interrupt Controller (NVIC),
  *          allowing for enabling, disabling, or configuring interrupt priority and other settings.
+ * @return  Error status indicating the success or failure of the operation.
  */
-void NVIC_IRQControl(IRQn_t IRQn , u32 Copy_Status);
+NVIC_enuErrorStatus_t NVIC_IRQControl(IRQn_t IRQn, u32 Copy_Status);
 
 /**
  * @brief   Sets the priority of the specified interrupt in the NVIC.
  * @param   IRQn: The interrupt for which the priority is to be set.
  * @param   priority: The priority level to be assigned to the interrupt.
  * @note    This function sets the priority level of the specified interrupt in the Nested Vector Interrupt Controller (NVIC).
+ * @return  Error status indicating the success or failure of the operation.
  */
-void NVIC_IRQPriority(IRQn_t IRQn, u32 priority);
+NVIC_enuErrorStatus_t NVIC_IRQPriority(IRQn_t IRQn, u32 priority);
 
 /**
  * @brief   Controls the pending status of the specified interrupt in the NVIC.
  * @param   IRQn: The interrupt to be controlled.
  * @param   Copy_Status: The pending status to be set for the interrupt (set/clear).
  * @note    This function allows controlling the pending status of the specified interrupt in the Nested Vector Interrupt Controller (NVIC).
+ * @return  Error status indicating the success or failure of the operation.
  */
-void NVIC_IRQPendingControl(IRQn_t IRQn , u32 Copy_Status);
+NVIC_enuErrorStatus_t NVIC_IRQPendingControl(IRQn_t IRQn, u32 Copy_Status);
 
 /**
  * @brief   Gets the active status of the specified interrupt in the NVIC.
@@ -305,17 +201,18 @@ void NVIC_IRQPendingControl(IRQn_t IRQn , u32 Copy_Status);
  * @param   Add_Status: Pointer to a variable to store the active status of the interrupt.
  * @note    This function retrieves the active status of the specified interrupt in the Nested Vector Interrupt Controller (NVIC),
  *          indicating whether the interrupt is currently active or not.
+ * @return  Error status indicating the success or failure of the operation.
  */
-void NVIC_GetActive(IRQn_t IRQn, u32 *Add_Status);
-
+NVIC_enuErrorStatus_t NVIC_GetActive(IRQn_t IRQn, u32 *Add_Status);
 
 /**
  * @brief   Generates a software interrupt for the specified interrupt in the NVIC.
  * @param   IRQn: The interrupt for which the software interrupt is to be generated.
  * @note    This function generates a software interrupt for the specified interrupt in the Nested Vector Interrupt Controller (NVIC),
  *          allowing software to trigger interrupt handling routines as if the interrupt were triggered by hardware.
+ * @return  Error status indicating the success or failure of the operation.
  */
-void NVIC_GenerateSwINT(IRQn_t IRQn);
+NVIC_enuErrorStatus_t NVIC_GenerateSwINT(IRQn_t IRQn);
 
 /**
  * @brief   Sets the priority grouping field in the NVIC.
