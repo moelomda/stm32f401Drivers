@@ -12,12 +12,11 @@
 #define INT_NACTIVE    0    // Interrupt not active
 
 
-#define NVIC_PRIORITYGROUP_16_NONE    (0x0UL << 8)  // None bits group, 16 bits subpriority
-#define NVIC_PRIORITYGROUP_8_2        (0x4UL << 8)  // 8 bits group, 2 bits subpriority
-#define NVIC_PRIORITYGROUP_4_4        (0x5UL << 8)  // 4 bits group, 4 bits subpriority
-#define NVIC_PRIORITYGROUP_2_8        (0x6UL << 8)  // 2 bits group, 8 bits subpriority
-#define NVIC_PRIORITYGROUP_NONE_16    (0x7UL << 8)  // None bits group, 16 bits subpriority
-
+#define NVIC_PRIORITYGROUP_4_NONE     (0x3 << 8)  // (4 bits) for group (0bit) for subgroup
+#define NVIC_PRIORITYGROUP_3_1        (0x4 << 8)  // (3 bits) for group (1bit) for subgroup
+#define NVIC_PRIORITYGROUP_2_2        (0x5 << 8)  // (2 bits) for group (2bits) for subgroup
+#define NVIC_PRIORITYGROUP_1_3        (0x6 << 8)  // (1 bit1) for group (3bit) for subgroup
+#define NVIC_PRIORITYGROUP_0_NONE     (0x7 << 8)  // (0 bits) for group (4bit) for subgroup
 
 
 #define PRIORITY_0     0
@@ -176,16 +175,6 @@ typedef enum {
  * @return  Error status indicating the success or failure of the operation.
  */
 NVIC_enuErrorStatus_t NVIC_IRQControl(IRQn_t IRQn, u32 Copy_Status);
-
-/**
- * @brief   Sets the priority of the specified interrupt in the NVIC.
- * @param   IRQn: The interrupt for which the priority is to be set.
- * @param   priority: The priority level to be assigned to the interrupt.
- * @note    This function sets the priority level of the specified interrupt in the Nested Vector Interrupt Controller (NVIC).
- * @return  Error status indicating the success or failure of the operation.
- */
-NVIC_enuErrorStatus_t NVIC_IRQPriority(IRQn_t IRQn, u32 priority);
-
 /**
  * @brief   Controls the pending status of the specified interrupt in the NVIC.
  * @param   IRQn: The interrupt to be controlled.
@@ -215,12 +204,14 @@ NVIC_enuErrorStatus_t NVIC_GetActive(IRQn_t IRQn, u32 *Add_Status);
 NVIC_enuErrorStatus_t NVIC_GenerateSwINT(IRQn_t IRQn);
 
 /**
- * @brief   Sets the priority grouping field in the NVIC.
- * @param   Copy_PriorityGrouping: The priority grouping value to be set.
- * @note    This function sets the priority grouping field in the Nested Vector Interrupt Controller (NVIC),
- *          which determines the number of bits used for preemption and subpriority levels in the interrupt priority.
- *          Refer to the device reference manual for the supported priority grouping values.
+ * @brief   Sets the priority of the specified interrupt in the NVIC.
+ * @param   IRQn: The interrupt for which the priority is to be set.
+ * @param   Copy_GroupPriorty: The group priority value to be assigned.
+ * @param   Copy_SubGroupPriorty: The subpriority value to be assigned.
+ * @param   Copy_GroupName: The configuration for priority grouping.
+ * @note    This function sets the priority level of the specified interrupt in the Nested Vector Interrupt Controller (NVIC).
+ *          It allows configuring both group priority and subpriority, based on the provided priority grouping configuration.
  */
-void NVIC_SetPriorityGrouping(u32 Copy_PriorityGrouping);
+void NVIC_SetIRQPriority(IRQn_t IRQn, u32 Copy_GroupPriorty, u32 Copy_SubGroupPriorty, u32 Copy_GroupName);
 
 #endif /* NVIC_H_ */
