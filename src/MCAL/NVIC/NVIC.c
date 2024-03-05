@@ -21,10 +21,10 @@ typedef struct {
     u32 NVIC_IPR[59];       /**< Interrupt Priority Registers */
     u32 Reserved5[643];     /**< Reserved space */
     u32 NVIC_STIR;          /**< Software Trigger Interrupt Register */
-} Nvic_tstrRegister;
+} NVIC_PERI_T;
 
 // NVIC base address
-#define NVIC  ((Nvic_tstrRegister*)(0xE000E100))
+#define NVIC  ((NVIC_PERI_T*)(0xE000E100))
 #define AIRCR (*(volatile u32*)0xE000ED0C)
 
 NVIC_enuErrorStatus_t NVIC_IRQControl(IRQn_t IRQn , u32 Copy_Status)
@@ -43,11 +43,11 @@ NVIC_enuErrorStatus_t NVIC_IRQControl(IRQn_t IRQn , u32 Copy_Status)
     {
         if (Copy_Status == IRQ_ENABLE)
         {
-            NVIC->NVIC_ISER[IRQn / BITS_32] |= (ONE << (IRQn % BITS_32));  // Enable interrupt
+            NVIC->NVIC_ISER[IRQn / BITS_32] = (ONE << (IRQn % BITS_32));  // Enable interrupt
         }
         else
         {
-            NVIC->NVIC_ICER[IRQn / BITS_32] |= (ONE << (IRQn % BITS_32));  // Disable interrupt
+            NVIC->NVIC_ICER[IRQn / BITS_32] = (ONE << (IRQn % BITS_32));  // Disable interrupt
         }
     }
 
@@ -70,11 +70,11 @@ NVIC_enuErrorStatus_t NVIC_IRQPendingControl(IRQn_t IRQn , u32 Copy_Status)
     {
         if (Copy_Status == SET_PENDING)
         {
-            NVIC->NVIC_ISPR[IRQn / BITS_32] |= (ONE << (IRQn % BITS_32));  // Set pending
+            NVIC->NVIC_ISPR[IRQn / BITS_32] = (ONE << (IRQn % BITS_32));  // Set pending
         }
         else
         {
-            NVIC->NVIC_ICPR[IRQn / BITS_32] |= (ONE << (IRQn % BITS_32));  // Clear pending
+            NVIC->NVIC_ICPR[IRQn / BITS_32] = (ONE << (IRQn % BITS_32));  // Clear pending
         }
     }
 
@@ -118,8 +118,7 @@ NVIC_enuErrorStatus_t NVIC_GenerateSwINT(IRQn_t IRQn)
         Loc_TempStir |= IRQn;
         NVIC->NVIC_STIR = Loc_TempStir;
     }
-
-    return Loc_ErrorStatus;
+     return Loc_ErrorStatus;
 }
 void NVIC_SetIRQPriority(IRQn_t IRQn, u32 Copy_GroupPriorty, u32 Copy_SubGroupPriorty, u32 Copy_GroupName)
 {
