@@ -2,7 +2,7 @@
 // Constants
 #define ONE              1
 #define AIRCR_PRI_CLR    0xFFFFF8FF
-#define GROUPS_BASE      (0x3 << 8)
+#define GROUPS_BASE      (0x05FA0300)
 #define BITS_32          32
 #define FOUR_BITS        4
 
@@ -120,18 +120,15 @@ NVIC_enuErrorStatus_t NVIC_GenerateSwINT(IRQn_t IRQn)
     }
      return Loc_ErrorStatus;
 }
-void NVIC_SetIRQPriority(IRQn_t IRQn, u32 Copy_GroupPriorty, u32 Copy_SubGroupPriorty, u32 Copy_GroupName)
+void NVIC_SetIRQPriority(IRQn_t IRQn, u32 Copy_preemtion, u32 Copy_SubGroupPriorty, u32 Copy_GroupName)
 {
     u32 Loc_Aircr = AIRCR;
     u16 Loc_bitIndex = ((IRQn % FOUR_BITS) * 8) + FOUR_BITS;
-    u16 Loc_PriortyValue = Copy_SubGroupPriorty | (Copy_GroupPriorty << ((Copy_GroupName - GROUPS_BASE) >> 8));
+    u16 Loc_PriortyValue = Copy_SubGroupPriorty | (Copy_preemtion << ((Copy_GroupName - GROUPS_BASE) >> 8));
     u32 Loc_TempIpr = NVIC->NVIC_IPR[IRQn / FOUR_BITS];
 
     Loc_TempIpr &= ~(0xF << Loc_bitIndex);
     Loc_TempIpr |= Loc_PriortyValue << Loc_bitIndex;
     NVIC->NVIC_IPR[IRQn / FOUR_BITS] = Loc_TempIpr;
-
-    Loc_Aircr &= AIRCR_PRI_CLR;
-    Loc_Aircr |= Copy_GroupName;
-    AIRCR = Loc_Aircr;
+    AIRCR = Copy_GroupName;
 }

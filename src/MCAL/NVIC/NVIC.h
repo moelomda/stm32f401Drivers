@@ -12,11 +12,11 @@
 #define INT_NACTIVE    0    // Interrupt not active
 
 
-#define NVIC_PRIORITYGROUP_4_NONE     (0x3 << 8)  // (4 bits) for group (0bit) for subgroup
-#define NVIC_PRIORITYGROUP_3_1        (0x4 << 8)  // (3 bits) for group (1bit) for subgroup
-#define NVIC_PRIORITYGROUP_2_2        (0x5 << 8)  // (2 bits) for group (2bits) for subgroup
-#define NVIC_PRIORITYGROUP_1_3        (0x6 << 8)  // (1 bit1) for group (3bit) for subgroup
-#define NVIC_PRIORITYGROUP_0_NONE     (0x7 << 8)  // (0 bits) for group (4bit) for subgroup
+#define NVIC_PRIORITYGROUP_4_NONE     0x05FA0300  // (4 bits) for preemtion (0bit) for subgroup
+#define NVIC_PRIORITYGROUP_3_1        0x05FA0400  // (3 bits) for preemtion (1bit) for subgroup
+#define NVIC_PRIORITYGROUP_2_2        0x05FA0500  // (2 bits) for preemtion (2bits) for subgroup
+#define NVIC_PRIORITYGROUP_1_3        0x05FA0600  // (1 bit1) for preemtion (3bit) for subgroup
+#define NVIC_PRIORITYGROUP_0_NONE     0x05FA0700  // (0 bits) for preemtion (4bit) for subgroup
 
 
 #define PRIORITY_0     0
@@ -212,6 +212,6 @@ NVIC_enuErrorStatus_t NVIC_GenerateSwINT(IRQn_t IRQn);
  * @note    This function sets the priority level of the specified interrupt in the Nested Vector Interrupt Controller (NVIC).
  *          It allows configuring both group priority and subpriority, based on the provided priority grouping configuration.
  */
-void NVIC_SetIRQPriority(IRQn_t IRQn, u32 Copy_GroupPriorty, u32 Copy_SubGroupPriorty, u32 Copy_GroupName);
+void NVIC_SetIRQPriority(IRQn_t IRQn, u32 Copy_preemtion, u32 Copy_SubGroupPriorty, u32 Copy_GroupName);
 
 #endif /* NVIC_H_ */
