@@ -70,6 +70,9 @@ SYSTICK_ErrorStatus_t SYSTICK_CtrlInterrupt(u32 Copy_Option);
  * @return  Status of the operation (success/error).
  */
 SYSTICK_ErrorStatus_t SYSTICK_SetTimeMs(u32 Copy_Value);
+
+
+
 SYSTICK_ErrorStatus_t SYSTICK_SetPeriodicty(u8 Copy_Periodicty);
 
 /**

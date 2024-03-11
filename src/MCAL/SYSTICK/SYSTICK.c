@@ -13,6 +13,7 @@ typedef struct
 #define MAX_Val      0x00FFFFFF
 #define STK_CTRL_ENABLE_MSK  0x00000001
 #define RESET          0
+#define SEC_TO_MS     1000
 u8 SYSTICK_Periodicty ;
 SYSTICK_Cbf_t SYSTICK_Cbf ;
 SYSTICK_ErrorStatus_t SYSTICK_SelectClkSrc(u32 Copy_ClkName){
@@ -43,15 +44,13 @@ SYSTICK_ErrorStatus_t SYSTICK_CtrlInterrupt(u32 Copy_Option){
 SYSTICK_ErrorStatus_t SYSTICK_SetTimeMs(u32 Copy_Value){
 	u8 Loc_ErrorStatus = SYSTICK_enuSuccess ;
 	u32 Temp_ClkSrc = (((SYSTICK->Systick_Ctrl)>>(2))&1);
-	if(Copy_Value > MAX_Val)
-	{
+	if(Copy_Value > MAX_Val){
 		Loc_ErrorStatus= SYSTICK_enuInvalidValue;
 	}
-	else
-	{
+	else{
 	u32 Loc_InputFrq= ((Temp_ClkSrc ==PROCESSOR_CLK) ? PROCESSPR_CLK_FRQ : (PROCESSPR_CLK_FRQ  /8));
-	u32 Loc_AssignedVal=(Copy_Value)/((1/Loc_InputFrq)*1000);
-	SYSTICK->Systick_Load = Loc_AssignedVal;
+	Copy_Value=(Copy_Value*Loc_InputFrq)/SEC_TO_MS;
+	SYSTICK->Systick_Load = (Copy_Value-1);
 	}
 	return Loc_ErrorStatus ;
 }
@@ -86,5 +85,7 @@ void SysTick_Handler(void){
     if(SYSTICK_Periodicty==PERIODICITY_ONETIME) {
         SYSTICK_Stop();
     }
+    if(SYSTICK_Cbf) {
     SYSTICK_Cbf();
+    }
 }
