@@ -1,8 +1,7 @@
 #include "SYSTICK.h"
 #include "SYSTICKCfg.h"
-typedef struct
-{
-	u32 Systick_Ctrl;
+typedef struct{   
+    u32 Systick_Ctrl;
 	u32 Systick_Load;
 	u32 Systick_Value;
 	u32 Systick_Calib;
@@ -13,7 +12,7 @@ typedef struct
 #define MAX_Val      0x00FFFFFF
 #define STK_CTRL_ENABLE_MSK  0x00000001
 #define RESET          0
-#define SEC_TO_MS     1000
+#define SEC_TO_MS     1048
 u8 SYSTICK_Periodicty ;
 SYSTICK_Cbf_t SYSTICK_Cbf ;
 SYSTICK_ErrorStatus_t SYSTICK_SelectClkSrc(u32 Copy_ClkName){
