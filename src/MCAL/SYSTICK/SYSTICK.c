@@ -1,5 +1,11 @@
 #include "SYSTICK.h"
 #include "SYSTICKCfg.h"
+#define CLK_SRC_CLR  ~(1<<2)
+#define INT_CLR      ~(1<<1)
+#define MAX_Val      0x00FFFFFF
+#define STK_CTRL_ENABLE_MSK  0x00000001
+#define RESET          0
+#define SEC_TO_MS     1048
 typedef struct{   
     u32 Systick_Ctrl;
 	u32 Systick_Load;
@@ -7,12 +13,6 @@ typedef struct{
 	u32 Systick_Calib;
 }SYSTICK_Registers_t;
 #define SYSTICK	((SYSTICK_Registers_t*)0xE000E010)
-#define CLK_SRC_CLR  ~(1<<2)
-#define INT_CLR      ~(1<<1)
-#define MAX_Val      0x00FFFFFF
-#define STK_CTRL_ENABLE_MSK  0x00000001
-#define RESET          0
-#define SEC_TO_MS     1048
 u8 SYSTICK_Periodicty ;
 SYSTICK_Cbf_t SYSTICK_Cbf ;
 SYSTICK_ErrorStatus_t SYSTICK_SelectClkSrc(u32 Copy_ClkName){
