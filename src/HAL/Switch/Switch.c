@@ -1,7 +1,8 @@
 #include "Switch.h"
 
 extern const Switchcfg_t Switches[_Switch_num];
-
+u8 Switch_State[_Switch_num];
+void Switch_Runnable();
 void Switch_Init(void)
 {
     GpioPinCfg_t Switch;
@@ -32,5 +33,29 @@ void Switch_GetSwitchState(u32 SwitchName, u32 *Add_SwitchState)
     {
       Loc_Temp = 0 ;
     }
-    *Add_SwitchState = Loc_State ^ Loc_Temp;
+    *Add_SwitchState = (Switch_State[SwitchName])^(Loc_Temp);
+}
+void Switch_Runnable()
+{
+   u8 Loc_Iterator= 0 ;
+   u32 Curr_State;
+   u8 Prev_State[_Switch_num];
+   u8 Counts[_Switch_num];
+   for(Loc_Iterator = 0 ; Loc_Iterator < _Switch_num ; Loc_Iterator++ ){
+   GPIO_GetPinValue(Switches[Loc_Iterator].Port, Switches[Loc_Iterator].Pin, &Curr_State);
+   if(Curr_State == Prev_State[Loc_Iterator] )
+   {
+	   Counts[Loc_Iterator]++;
+   }
+   else
+   {
+	   Counts[Loc_Iterator]= 0;
+   }
+   if(Counts[Loc_Iterator]==5)
+   {
+     Switch_State[Loc_Iterator]=Curr_State;
+     Counts[Loc_Iterator]= 0;
+   }
+     Prev_State[Loc_Iterator]= Curr_State;
+   }
 }
