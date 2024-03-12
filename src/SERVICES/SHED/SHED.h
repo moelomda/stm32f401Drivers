@@ -12,6 +12,7 @@ typedef struct {
     char *Name;          // Name of the task
     u32 PeriodicityMs;   // Periodicity of the task in milliseconds
     u32 Priorty;         // Priority of the task
+    u32 DelayMs;
     RunableCb_t Cb;     // Callback function pointer for the task
 } Runnable_t;
 

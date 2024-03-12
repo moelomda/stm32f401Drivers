@@ -12,6 +12,7 @@ const Runnable_t Run_Arr[_Tasks_Number] =
         .Name = "Runabble1",
         .PeriodicityMs = 30,
         .Priorty = 1,
+		.DelayMs = 3,
         .Cb = &Runnable_APP1,
     },
 
@@ -20,6 +21,7 @@ const Runnable_t Run_Arr[_Tasks_Number] =
         .Name = "Runabble2",
         .PeriodicityMs = 15,
         .Priorty = 0,
+		.DelayMs = 5,
         .Cb = &Runnable_APP2,
     }
 };
