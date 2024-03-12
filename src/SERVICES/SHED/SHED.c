@@ -49,7 +49,7 @@ void SHED_Init()
     SHED_Start(); /**< Start the scheduler */
     for (Idx = 0; Idx < _Tasks_Number; Idx++)
     {
-        RInfo_Arr[Idx].RemainingTimeMs = Run_Arr[Run_Arr[Idx].Priorty].PeriodicityMs; /**< Initialize task information */
+        RInfo_Arr[Run_Arr[Idx].Priorty].RemainingTimeMs = Run_Arr[Idx].PeriodicityMs; /**< Initialize task information */
     }
 }
 void SHED_Start()
