@@ -9,6 +9,7 @@
 #define TICKTIME 1 /**< Time in milliseconds for each tick */
 
 typedef struct {
+	//Runnable_t * Runnable;
     u32 RemainingTimeMs; /**< Remaining time in milliseconds for the task */
 } RunabbleInfo_t;
 
@@ -49,6 +50,7 @@ void SHED_Init()
     SHED_Start(); /**< Start the scheduler */
     for (Idx = 0; Idx < _Tasks_Number; Idx++)
     {
+    	//RInfo_Arr[Run_Arr[Idx].Priorty].Runnable = Run_Arr[Idx];
         RInfo_Arr[Run_Arr[Idx].Priorty].RemainingTimeMs = Run_Arr[Idx].DelayMs; /**< Initialize task information */
     }
 }
