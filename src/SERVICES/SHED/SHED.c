@@ -47,7 +47,7 @@ void SHED_Init()
     SYSTICK_SetPeriodicty(PERIODICITY_AUTO); /**< Set SYSTICK periodicity to automatic */
     SYSTICK_SetTimeMs(TICKTIME); /**< Set SYSTICK timer time to TICKTIME milliseconds */
     SYSTICK_SetCallBack(tickcb); /**< Set the callback function for SYSTICK interrupts */
-    SHED_Start(); /**< Start the scheduler */
+    //SHED_Start(); /**< Start the scheduler */
     for (Idx = 0; Idx < _Tasks_Number; Idx++)
     {
     	//RInfo_Arr[Run_Arr[Idx].Priorty].Runnable = Run_Arr[Idx];
