@@ -6,7 +6,7 @@
 #include "SHED.h"
 #include "SYSTICK.h"
 
-#define TICKTIME 1 /**< Time in milliseconds for each tick */
+#define TICKTIME  1 /**< Time in milliseconds for each tick */
 
 typedef struct {
 	//Runnable_t * Runnable;
@@ -42,7 +42,7 @@ static void SHED(void)
 void SHED_Init()
 {
     u32 Idx;
-    SYSTICK_SelectClkSrc(AHB_DEV8_CLK); /**< Select the clock source for the SYSTICK timer */
+    SYSTICK_SelectClkSrc(PROCESSOR_CLK); /**< Select the clock source for the SYSTICK timer */
     SYSTICK_CtrlInterrupt(SYSTICK_EXCEP_EN); /**< Enable SYSTICK interrupts */
     SYSTICK_SetPeriodicty(PERIODICITY_AUTO); /**< Set SYSTICK periodicity to automatic */
     SYSTICK_SetTimeMs(TICKTIME); /**< Set SYSTICK timer time to TICKTIME milliseconds */
@@ -59,10 +59,11 @@ void SHED_Start()
     SYSTICK_Start(); /**< Start the SYSTICK timer */
     while (1)
     {
-        if (PendingTicks)
+         if (PendingTicks)
         {
-            PendingTicks--; /**< Decrement the number of pending ticks */
             SHED(); /**< Execute the scheduler */
+            PendingTicks--; /**< Decrement the number of pending ticks */
+
         }
     }
 }

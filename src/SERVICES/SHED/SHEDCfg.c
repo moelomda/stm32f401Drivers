@@ -10,7 +10,7 @@ const Runnable_t Run_Arr[_Tasks_Number] =
     [Task1_Runabble] =
     {
         .Name = "Runabble1",
-        .PeriodicityMs = 30,
+        .PeriodicityMs = 1000,
         .Priorty = 1,
 		.DelayMs = 3,
         .Cb = &Runnable_APP1,
@@ -19,7 +19,7 @@ const Runnable_t Run_Arr[_Tasks_Number] =
     [Task2_Runabble] =
     {
         .Name = "Runabble2",
-        .PeriodicityMs = 15,
+        .PeriodicityMs = 500,
         .Priorty = 0,
 		.DelayMs = 5,
         .Cb = &Runnable_APP2,
