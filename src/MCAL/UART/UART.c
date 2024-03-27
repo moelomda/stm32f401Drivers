@@ -70,6 +70,8 @@ typedef struct
 Interrupt_State Interrupt_Cfg;
 UART_TxReqBuff_t Tx_Req;
 UART_RxReqBuff_t Rx_Req;
+static Cb_t Cb_TxArr[3];
+static Cb_t Cb_RxArr[3];
 
 static UART_t * const ChannelArr[UART_CHANNELS]={(UART_t*)UART1_BASE_ADDRESS,
 		                                         (UART_t*)UART2_BASE_ADDRESS,
@@ -165,6 +167,30 @@ UART_ErrorStatus_t UART_RxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
 	    	ChannelArr[Rx_Req.buff.Channel]->CR1 |= Interrupt_Cfg.RX_DR_Empty;
          }
 	return Loc_ErrorStatus ;
+}
+UART_ErrorStatus_t UART_CallBackFunction(UART_Channel Channel, UART_enuMode_t Mode, Cb_t Add_CallBackFunction)
+{
+   u8 Loc_ErrorStatus =UART_Succ;
+   if(!Add_CallBackFunction)
+   {
+      if(Mode == TxMode)
+      {
+    	  Cb_TxArr[Channel] = Add_CallBackFunction;
+      }
+      else if (Mode == RxMode)
+      {
+    	  Cb_RxArr[Channel] = Add_CallBackFunction;
+      }
+      else
+      {
+    	  Loc_ErrorStatus= UART_Invalid_Mode;
+      }
+   }
+   else
+   {
+	   Loc_ErrorStatus= UART_NullPtr;
+   }
+   return Loc_ErrorStatus;
 }
 static void Helper_Calculate_Baudrate_Scaled(UART_ConfigType* Config , uint16_t *mantissa, uint8_t *fraction)
 {
