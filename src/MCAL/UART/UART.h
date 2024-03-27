@@ -87,17 +87,6 @@ typedef struct
     u16 BaudRate;
 } UART_ConfigType;
 
-typedef struct
-{
-    u32 *buff;
-    u16 len;
-} UART_CfgReceiveBuff_t;
-
-typedef struct
-{
-    u32 *buff;
-    u16 len;
-} UART_CfgTransBuff_t;
 
 typedef enum
 {
@@ -128,7 +117,7 @@ UART_ErrorStatus_t UART_vidInit(const UART_ConfigType* ConfigPtr);
 
     Return: Error status indicating success or failure.
 */
-UART_ErrorStatus_t UART_SendByteAsynchronous(UART_Channel Channel, u8 Copy_u8Data);
+UART_ErrorStatus_t UART_SendByteAsynch(UART_Channel Channel, u8 Copy_u8Data);
 
 /*
     Function Name: 	UART_ReceiveBuffer
@@ -140,7 +129,7 @@ UART_ErrorStatus_t UART_SendByteAsynchronous(UART_Channel Channel, u8 Copy_u8Dat
 
     Return: Error status indicating success or failure.
 */
-UART_ErrorStatus_t UART_ReceiveBuffer(const UART_CfgReceiveBuff_t* ReceiveBuffer);
+UART_ErrorStatus_t UART_RxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb );
 
 /*
     Function Name: 	UART_SendBufferZeroCopy
@@ -152,7 +141,7 @@ UART_ErrorStatus_t UART_ReceiveBuffer(const UART_CfgReceiveBuff_t* ReceiveBuffer
 
     Return: Error status indicating success or failure.
 */
-UART_ErrorStatus_t UART_SendBufferZeroCopy(const UART_CfgTransBuff_t* Copy_sConfigBuffer);
+UART_ErrorStatus_t UART_TxBufferZeroCopy(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb );
 
 /*
     Function Name: 	UART_RegisterCallBackFunction

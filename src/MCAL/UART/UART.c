@@ -27,6 +27,8 @@
 #define UART_CR1_SBK_Pos            0
 #define TXE_MASK                 0xFFFFFF7F
 #define TXE_BIT_POS                 7
+#define BUSY                        1
+#define IDLE                        0
 
 typedef struct
 {
@@ -44,8 +46,29 @@ typedef struct
 	u8 TX_DR_Empty;
 	u8 RX_DR_Empty;
 }Interrupt_State;
+typedef struct
+{
+  UART_Channel Channel;
+  u16 *data;
+  u32 pos ;
+  u32 size;
+}UART_Buff_t;
+typedef struct
+{
+	UART_Buff_t buff;
+    u8 State ;
+    Cb_t Cb;
+} UART_TxReqBuff_t;
+
+typedef struct
+{
+	UART_Buff_t buff;
+    u8 State ;
+    Cb_t Cb;
+} UART_RxReqBuff_t;
 
 Interrupt_State Interrupt_Cfg;
+UART_TxReqBuff_t Tx_Req;
 
 static UART_t * const ChannelArr[UART_CHANNELS]={(UART_t*)UART1_BASE_ADDRESS,
 		                                         (UART_t*)UART2_BASE_ADDRESS,
@@ -78,7 +101,8 @@ UART_ErrorStatus_t UART_vidInit(const UART_ConfigType* ConfigPtr)
   }
   return Loc_ErrorStatus ;
 }
-UART_ErrorStatus_t UART_SendByteAsynchronous(UART_Channel Channel, u8 Copy_Data)
+UART_ErrorStatus_t UART_SendByteAsynch(UART_Channel Channel, u8 Copy_Data)
+
 {
 	UART_ErrorStatus_t Loc_ErrorStauts = UART_Succ ;
     u32 Loc_TempTxe = (ChannelArr[Channel] ->SR & TXE_MASK)>>TXE_BIT_POS;
@@ -93,6 +117,53 @@ UART_ErrorStatus_t UART_SendByteAsynchronous(UART_Channel Channel, u8 Copy_Data)
     }
 
 	return Loc_ErrorStauts ;
+}
+UART_ErrorStatus_t UART_TxBufferZeroCopy(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
+
+{
+    u8 Loc_ErrorStatus = UART_Succ ;
+    if(!Cb)
+    {
+    	Loc_ErrorStatus = UART_NullPtr;
+    }
+    else if(Tx_Req.State == BUSY)
+	{
+    	Loc_ErrorStatus = UART_BUSY;
+	}
+    else
+    {
+    	Tx_Req.State = BUSY;
+    	Tx_Req.buff.data = Copy_Buffer ;
+    	Tx_Req.buff.size = Copy_len;
+    	Tx_Req.buff.pos = 0;
+    	Tx_Req.Cb = Cb;
+    	ChannelArr[Tx_Req.buff.Channel]->DR =Tx_Req.buff.data[0];
+    	Tx_Req.buff.pos++;
+    	ChannelArr[Tx_Req.buff.Channel]->CR1 |= Interrupt_Cfg.Transmit_Complete;
+    }
+    return Loc_ErrorStatus;
+}
+UART_ErrorStatus_t UART_RxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
+{
+	 u8 Loc_ErrorStatus = UART_Succ ;
+	    if(!Cb)
+	    {
+	    	Loc_ErrorStatus = UART_NullPtr;
+	    }
+	    else if(Tx_Req.State == BUSY)
+		{
+	    	Loc_ErrorStatus = UART_BUSY;
+		}
+	    else
+	    {
+	    	Tx_Req.State = BUSY;
+	    	Tx_Req.buff.data = Copy_Buffer ;
+	    	Tx_Req.buff.size = Copy_len;
+	    	Tx_Req.buff.pos = 0;
+	    	Tx_Req.Cb = Cb;
+	    	ChannelArr[Tx_Req.buff.Channel]->CR1 |= Interrupt_Cfg.RX_DR_Empty;
+         }
+	return Loc_ErrorStatus ;
 }
 static void Helper_Calculate_Baudrate_Scaled(UART_ConfigType* Config , uint16_t *mantissa, uint8_t *fraction)
 {
