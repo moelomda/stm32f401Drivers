@@ -69,6 +69,7 @@ typedef struct
 
 Interrupt_State Interrupt_Cfg;
 UART_TxReqBuff_t Tx_Req;
+UART_RxReqBuff_t Rx_Req;
 
 static UART_t * const ChannelArr[UART_CHANNELS]={(UART_t*)UART1_BASE_ADDRESS,
 		                                         (UART_t*)UART2_BASE_ADDRESS,
@@ -156,12 +157,12 @@ UART_ErrorStatus_t UART_RxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
 		}
 	    else
 	    {
-	    	Tx_Req.State = BUSY;
-	    	Tx_Req.buff.data = Copy_Buffer ;
-	    	Tx_Req.buff.size = Copy_len;
-	    	Tx_Req.buff.pos = 0;
-	    	Tx_Req.Cb = Cb;
-	    	ChannelArr[Tx_Req.buff.Channel]->CR1 |= Interrupt_Cfg.RX_DR_Empty;
+	    	Rx_Req.State = BUSY;
+	    	Rx_Req.buff.data = Copy_Buffer ;
+	    	Rx_Req.buff.size = Copy_len;
+	    	Rx_Req.buff.pos = 0;
+	    	Rx_Req.Cb = Cb;
+	    	ChannelArr[Rx_Req.buff.Channel]->CR1 |= Interrupt_Cfg.RX_DR_Empty;
          }
 	return Loc_ErrorStatus ;
 }
