@@ -25,20 +25,24 @@
 #define UART_CR1_RE_Pos             2
 #define UART_CR1_RWU_Pos            1
 #define UART_CR1_SBK_Pos            0
-#define TXE_MASK                 0xFFFFFF7F
+#define TXE_MASK                 0x00000080
+#define RXNE_MASK                0x00000020
+#define TC_MASK                  0x00000040
 #define TXE_BIT_POS                 7
+#define TC_BIT_POS                  6
+#define RXNE_BIT_POS                5
 #define BUSY                        1
 #define IDLE                        0
 
 typedef struct
 {
-	volatile uint32_t SR;
-	volatile uint32_t DR;
-	volatile uint32_t BRR;
-	volatile uint32_t CR1;
-	volatile uint32_t CR2;
-	volatile uint32_t CR3;
-	volatile uint32_t GTPR;
+	volatile u32 SR;
+	volatile u32 DR;
+	volatile u32 BRR;
+	volatile u32 CR1;
+	volatile u32 CR2;
+	volatile u32 CR3;
+	volatile u32 GTPR;
 }UART_t;
 typedef struct
 {
@@ -76,7 +80,7 @@ static Cb_t Cb_RxArr[3];
 static UART_t * const ChannelArr[UART_CHANNELS]={(UART_t*)UART1_BASE_ADDRESS,
 		                                         (UART_t*)UART2_BASE_ADDRESS,
 												 (UART_t*)UART6_BASE_ADDRESS};
-static void Helper_Calculate_Baudrate_Scaled(UART_ConfigType* Config , uint16_t *mantissa, uint8_t *fraction);
+static void Helper_Calculate_Baudrate_Scaled(const UART_ConfigType* Config, u16 *mantissa, u8 *fraction);
 UART_ErrorStatus_t UART_vidInit(const UART_ConfigType* ConfigPtr)
 {
   u8 Loc_ErrorStatus = UART_Succ;
@@ -88,7 +92,7 @@ UART_ErrorStatus_t UART_vidInit(const UART_ConfigType* ConfigPtr)
   }
   else
   {
-	  Helper_Calculate_Baudrate_Scaled(&ConfigPtr ,&Loc_Mantissa,&Loc_Fraction);
+	  Helper_Calculate_Baudrate_Scaled(ConfigPtr ,&Loc_Mantissa,&Loc_Fraction);
 	  ChannelArr[ConfigPtr->Channel]->CR1  = 0;
 	  ChannelArr[ConfigPtr->Channel]->BRR |= ((Loc_Mantissa << 4) | (Loc_Fraction & 0x0F));
 	  ChannelArr[ConfigPtr->Channel]->CR1 |= (ConfigPtr->Oversampling)<<UART_CR1_OVER8_Pos;
@@ -136,7 +140,7 @@ UART_ErrorStatus_t UART_TxBufferZeroCopy(u16 Copy_Buffer , u32 Copy_len , Cb_t C
     else
     {
     	Tx_Req.State = BUSY;
-    	Tx_Req.buff.data = Copy_Buffer ;
+    	*(Rx_Req.buff.data) = Copy_Buffer ;
     	Tx_Req.buff.size = Copy_len;
     	Tx_Req.buff.pos = 0;
     	Tx_Req.Cb = Cb;
@@ -160,7 +164,7 @@ UART_ErrorStatus_t UART_RxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
 	    else
 	    {
 	    	Rx_Req.State = BUSY;
-	    	Rx_Req.buff.data = Copy_Buffer ;
+	    	*(Rx_Req.buff.data) = Copy_Buffer ;
 	    	Rx_Req.buff.size = Copy_len;
 	    	Rx_Req.buff.pos = 0;
 	    	Rx_Req.Cb = Cb;
@@ -192,15 +196,10 @@ UART_ErrorStatus_t UART_CallBackFunction(UART_Channel Channel, UART_enuMode_t Mo
    }
    return Loc_ErrorStatus;
 }
-static void Helper_Calculate_Baudrate_Scaled(UART_ConfigType* Config , uint16_t *mantissa, uint8_t *fraction)
+static void Helper_Calculate_Baudrate_Scaled(const UART_ConfigType* Config , u16 *mantissa, u8 *fraction)
 {
 	u64 scaled_usartdiv;
 	u16 temp_fraction;
-	u8 Loc_ErrorStatus = UART_Succ;
-	if(!Config)
-	  {
-		  Loc_ErrorStatus = UART_NullPtr;
-	  }
 	scaled_usartdiv = ((u64)SYS_CLK * 1000) / (Config->BaudRate * (8 * (2 - Config->Oversampling)));
 
 	temp_fraction = (scaled_usartdiv % 1000) * (8 * (2 - Config->Oversampling));
@@ -213,4 +212,119 @@ static void Helper_Calculate_Baudrate_Scaled(UART_ConfigType* Config , uint16_t 
 
 	*mantissa = scaled_usartdiv / 1000;
 	*fraction = temp_fraction;
+}
+void USART1_IRQHandler(void)
+{
+		if((ChannelArr[0] ->SR & TC_MASK)>>(TC_BIT_POS))
+		{
+	      if(Tx_Req.buff.pos < Tx_Req.buff.size)
+	      {
+	    	  ChannelArr[0] ->SR &= (1<<TC_BIT_POS);
+	    	  ChannelArr[0]->DR =Tx_Req.buff.data[Tx_Req.buff.pos];
+	    	  Tx_Req.buff.pos++;
+	      }
+	      else
+	      {
+	    	  Tx_Req.State = IDLE ;
+	    	  if(Tx_Req.Cb)
+	    	  {
+	    		  Tx_Req.Cb();
+	    	  }
+	    	  ChannelArr[0] ->SR &= (1<<TC_BIT_POS);
+	      }
+		}
+		if((ChannelArr[0] ->SR & RXNE_MASK)>>(RXNE_BIT_POS ))
+		{
+			if(Rx_Req.buff.pos < Rx_Req.buff.size)
+			      {
+			          Rx_Req.buff.data[Rx_Req.buff.pos]= ChannelArr[0]->DR ;
+			    	  Rx_Req.buff.pos++;
+			      }
+			      else
+			      {
+			    	  ChannelArr[0] ->SR &= (1<<RXNE_BIT_POS);
+			    	  Rx_Req.State = IDLE ;
+			    	  if(Rx_Req.Cb)
+			    	  {
+			    		  Rx_Req.Cb();
+			    	  }
+			      }
+}
+	}
+
+void USART2_IRQHandler(void)
+{
+	if((ChannelArr[1] ->SR & TC_MASK)>>(TC_BIT_POS))
+	{
+      if(Tx_Req.buff.pos < Tx_Req.buff.size)
+      {
+    	  ChannelArr[1] ->SR &= (1<<TC_BIT_POS);
+    	  ChannelArr[1]->DR =Tx_Req.buff.data[Tx_Req.buff.pos];
+    	  Tx_Req.buff.pos++;
+      }
+      else
+      {
+    	  Tx_Req.State = IDLE ;
+    	  if(Tx_Req.Cb)
+    	  {
+    		  Tx_Req.Cb();
+    	  }
+    	  ChannelArr[1] ->SR &= (1<<TC_BIT_POS);
+      }
+	}
+	if((ChannelArr[1] ->SR & RXNE_MASK)>>(RXNE_BIT_POS ))
+	{
+		if(Rx_Req.buff.pos < Rx_Req.buff.size)
+		      {
+		          Rx_Req.buff.data[Rx_Req.buff.pos]= ChannelArr[1]->DR ;
+		    	  Rx_Req.buff.pos++;
+		      }
+		      else
+		      {
+		    	  ChannelArr[1] ->SR &= (1<<RXNE_BIT_POS);
+		    	  Rx_Req.State = IDLE ;
+		    	  if(Rx_Req.Cb)
+		    	  {
+		    		  Rx_Req.Cb();
+		    	  }
+		      }
+	}
+}
+void USART6_IRQHandler(void)
+{
+	if((ChannelArr[2] ->SR & TC_MASK)>>(TC_BIT_POS))
+	{
+      if(Tx_Req.buff.pos < Tx_Req.buff.size)
+      {
+    	  ChannelArr[2] ->SR &= (1<<TC_BIT_POS);
+    	  ChannelArr[2]->DR =Tx_Req.buff.data[Tx_Req.buff.pos];
+    	  Tx_Req.buff.pos++;
+      }
+      else
+      {
+    	  Tx_Req.State = IDLE ;
+    	  if(Tx_Req.Cb)
+    	  {
+    		  Tx_Req.Cb();
+    	  }
+    	  ChannelArr[2] ->SR &= (1<<TC_BIT_POS);
+      }
+	}
+	if((ChannelArr[2] ->SR & RXNE_MASK)>>(RXNE_BIT_POS ))
+	{
+		if(Rx_Req.buff.pos < Rx_Req.buff.size)
+		      {
+		          Rx_Req.buff.data[Rx_Req.buff.pos]= ChannelArr[3]->DR ;
+		    	  Rx_Req.buff.pos++;
+		      }
+		      else
+		      {
+		    	  ChannelArr[2] ->SR &= (1<<RXNE_BIT_POS);
+		    	  Rx_Req.State = IDLE ;
+		    	  if(Rx_Req.Cb)
+		    	  {
+		    		  Rx_Req.Cb();
+		    	  }
+		      }
+	}
 }
