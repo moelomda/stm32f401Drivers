@@ -104,7 +104,7 @@ typedef enum
 
     Return: Error status indicating success or failure.
 */
-UART_ErrorStatus_t UART_vidInit(const UART_ConfigType* ConfigPtr);
+UART_ErrorStatus_t UART_Init(const UART_ConfigType* ConfigPtr);
 
 /*
     Function Name: 	UART_SendByteAsynchronous

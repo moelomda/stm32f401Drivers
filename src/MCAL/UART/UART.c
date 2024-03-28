@@ -1,9 +1,7 @@
-/*
- * UART.c
- *
- *  Created on: ???/???/????
- *      Author: Mohamed Elomda
- */
+/*==========================================================
+ * File: UART.c
+ * Author: [Mohamed Ahmed Fouad ]
+ ===========================================================*/
 #include "UART.h"
 #define UART1_BASE_ADDRESS             0x40011000
 #define UART2_BASE_ADDRESS             0x40004400
@@ -70,18 +68,16 @@ typedef struct
     u8 State ;
     Cb_t Cb;
 } UART_RxReqBuff_t;
-
 Interrupt_State Interrupt_Cfg;
 UART_TxReqBuff_t Tx_Req;
 UART_RxReqBuff_t Rx_Req;
 static Cb_t Cb_TxArr[3];
 static Cb_t Cb_RxArr[3];
-
 static UART_t * const ChannelArr[UART_CHANNELS]={(UART_t*)UART1_BASE_ADDRESS,
 		                                         (UART_t*)UART2_BASE_ADDRESS,
 												 (UART_t*)UART6_BASE_ADDRESS};
 static void Helper_Calculate_Baudrate_Scaled(const UART_ConfigType* Config, u16 *mantissa, u8 *fraction);
-UART_ErrorStatus_t UART_vidInit(const UART_ConfigType* ConfigPtr)
+UART_ErrorStatus_t UART_Init(const UART_ConfigType* ConfigPtr)
 {
   u8 Loc_ErrorStatus = UART_Succ;
   u16 Loc_Mantissa ;
@@ -109,11 +105,9 @@ UART_ErrorStatus_t UART_vidInit(const UART_ConfigType* ConfigPtr)
   return Loc_ErrorStatus ;
 }
 UART_ErrorStatus_t UART_SendByteAsynch(UART_Channel Channel, u8 Copy_Data)
-
 {
 	UART_ErrorStatus_t Loc_ErrorStauts = UART_Succ ;
-    u32 Loc_TempTxe = (ChannelArr[Channel] ->SR & TXE_MASK)>>TXE_BIT_POS;
-    if(!Loc_TempTxe)
+    if((ChannelArr[Channel] ->SR & TXE_MASK)>>(TXE_BIT_POS))
     {
     	Loc_ErrorStauts = UART_BUSY ;
     }
@@ -122,8 +116,7 @@ UART_ErrorStatus_t UART_SendByteAsynch(UART_Channel Channel, u8 Copy_Data)
     	ChannelArr[Channel]->DR = Copy_Data ;
     	ChannelArr[Channel]->CR1 |= Interrupt_Cfg.Transmit_Complete ;
     }
-
-	return Loc_ErrorStauts ;
+    return Loc_ErrorStauts ;
 }
 UART_ErrorStatus_t UART_TxBufferZeroCopy(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
 
@@ -219,7 +212,7 @@ void USART1_IRQHandler(void)
 		{
 	      if(Tx_Req.buff.pos < Tx_Req.buff.size)
 	      {
-	    	  ChannelArr[0] ->SR &= (1<<TC_BIT_POS);
+	    	  ChannelArr[0] ->SR &= ~(1<<TC_BIT_POS);
 	    	  ChannelArr[0]->DR =Tx_Req.buff.data[Tx_Req.buff.pos];
 	    	  Tx_Req.buff.pos++;
 	      }
@@ -230,7 +223,7 @@ void USART1_IRQHandler(void)
 	    	  {
 	    		  Tx_Req.Cb();
 	    	  }
-	    	  ChannelArr[0] ->SR &= (1<<TC_BIT_POS);
+	    	  ChannelArr[0] ->SR &= ~(1<<TC_BIT_POS);
 	      }
 		}
 		if((ChannelArr[0] ->SR & RXNE_MASK)>>(RXNE_BIT_POS ))
@@ -242,7 +235,8 @@ void USART1_IRQHandler(void)
 			      }
 			      else
 			      {
-			    	  ChannelArr[0] ->SR &= (1<<RXNE_BIT_POS);
+
+			    	  ChannelArr[0] ->SR &= ~(1<<RXNE_BIT_POS);
 			    	  Rx_Req.State = IDLE ;
 			    	  if(Rx_Req.Cb)
 			    	  {
@@ -258,7 +252,7 @@ void USART2_IRQHandler(void)
 	{
       if(Tx_Req.buff.pos < Tx_Req.buff.size)
       {
-    	  ChannelArr[1] ->SR &= (1<<TC_BIT_POS);
+    	  ChannelArr[1] ->SR &= ~(1<<TC_BIT_POS);
     	  ChannelArr[1]->DR =Tx_Req.buff.data[Tx_Req.buff.pos];
     	  Tx_Req.buff.pos++;
       }
@@ -269,7 +263,7 @@ void USART2_IRQHandler(void)
     	  {
     		  Tx_Req.Cb();
     	  }
-    	  ChannelArr[1] ->SR &= (1<<TC_BIT_POS);
+    	  ChannelArr[1] ->SR &= ~(1<<TC_BIT_POS);
       }
 	}
 	if((ChannelArr[1] ->SR & RXNE_MASK)>>(RXNE_BIT_POS ))
@@ -281,7 +275,7 @@ void USART2_IRQHandler(void)
 		      }
 		      else
 		      {
-		    	  ChannelArr[1] ->SR &= (1<<RXNE_BIT_POS);
+		    	  ChannelArr[1] ->SR &= ~(1<<RXNE_BIT_POS);
 		    	  Rx_Req.State = IDLE ;
 		    	  if(Rx_Req.Cb)
 		    	  {
@@ -296,7 +290,7 @@ void USART6_IRQHandler(void)
 	{
       if(Tx_Req.buff.pos < Tx_Req.buff.size)
       {
-    	  ChannelArr[2] ->SR &= (1<<TC_BIT_POS);
+    	  ChannelArr[2] ->SR &= ~(1<<TC_BIT_POS);
     	  ChannelArr[2]->DR =Tx_Req.buff.data[Tx_Req.buff.pos];
     	  Tx_Req.buff.pos++;
       }
@@ -307,7 +301,7 @@ void USART6_IRQHandler(void)
     	  {
     		  Tx_Req.Cb();
     	  }
-    	  ChannelArr[2] ->SR &= (1<<TC_BIT_POS);
+    	  ChannelArr[2] ->SR &= ~(1<<TC_BIT_POS);
       }
 	}
 	if((ChannelArr[2] ->SR & RXNE_MASK)>>(RXNE_BIT_POS ))
@@ -319,7 +313,7 @@ void USART6_IRQHandler(void)
 		      }
 		      else
 		      {
-		    	  ChannelArr[2] ->SR &= (1<<RXNE_BIT_POS);
+		    	  ChannelArr[2] ->SR &= ~(1<<RXNE_BIT_POS);
 		    	  Rx_Req.State = IDLE ;
 		    	  if(Rx_Req.Cb)
 		    	  {
