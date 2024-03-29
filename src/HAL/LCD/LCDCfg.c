@@ -48,28 +48,28 @@ LCD_Str_t LCD_config = {
         // Configuration for LCD_StrDataReg[4]
         [4] = {
             .GPIO_Port = PORT_A,
-            .GPIO_Pin = GPIO_PIN_6,
+            .GPIO_Pin = GPIO_PIN_7,
             .GPIO_Direction = GPIO_OUTPUT,
             .GPIO_Mode = GPIO_OTYPE_PUSHPULL
         },
         // Configuration for LCD_StrDataReg[5]
         [5] = {
             .GPIO_Port = PORT_A,
-            .GPIO_Pin = GPIO_PIN_7,
+            .GPIO_Pin = GPIO_PIN_8,
             .GPIO_Direction = GPIO_OUTPUT,
             .GPIO_Mode = GPIO_OTYPE_PUSHPULL
         },
         // Configuration for LCD_StrDataReg[6] (Using PORTB)
         [6] = {
-            .GPIO_Port = PORT_B,
-            .GPIO_Pin = GPIO_PIN_0,
+            .GPIO_Port = PORT_A,
+            .GPIO_Pin = GPIO_PIN_9,
             .GPIO_Direction = GPIO_OUTPUT,
             .GPIO_Mode = GPIO_OTYPE_PUSHPULL
         },
         // Configuration for LCD_StrDataReg[7] (Using PORTB)
         [7] = {
-            .GPIO_Port = PORT_B,
-            .GPIO_Pin = GPIO_PIN_1,
+            .GPIO_Port = PORT_A,
+            .GPIO_Pin = GPIO_PIN_10,
             .GPIO_Direction = GPIO_OUTPUT,
             .GPIO_Mode = GPIO_OTYPE_PUSHPULL
         }

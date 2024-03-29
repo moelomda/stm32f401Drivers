@@ -7,7 +7,7 @@
 #define ENTRY_MODE_INC_SHIFT_OFF                0x06  // Set entry mode: increment cursor, no display shift (Normal Mode)
 #define LCD_ENTRY_MODE_DEC_SHIFT_ON             0x05  // Set entry mode: decrement cursor, with display shift
 
-
+#define LCD_TASK_PERIODICTY                     1
 #define LCD_ENTRY_MODE_INC_SHIFT_ON             0x07  // Set entry mode: increment cursor, with display shift
 #define LCD_DISPLAY_CURSOR_BLINK_ALL_OFF        0x08  // Turn off display, cursor, and blinking
 #define LCD_DISPLAY_ON_CURSOR_OFF_BLINK_OFF     0x0C  // Turn on display without cursor and blinking
@@ -37,7 +37,7 @@ void LCD_GetStatus(u8 *LCD_Status);
 void LCD_WriteCommand(u8 Copy_u8Command);
 
 
-void LCD_WriteStringPos(u8 Copy_u8Row, u8 Copy_u8Col, u8 *Copy_AddStr);
+void LCD_WriteString(const char *Copy_AddStr , u8 len);
 
 
 void LCD_SetCursor(u8 Copy_u8Row, u8 Copy_u8Col);
