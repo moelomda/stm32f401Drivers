@@ -12,7 +12,7 @@
 #define USER_RQ_RDY                   0
 #define USER_REQ_TYP_SET_CURS         0
 #define USER_REQ_TYP_WRITE_STR        1
-#define USER_REQ_TYP_WRITE_COMM       2
+#define USER_REQ_TYP_CLR_DIS          2
 #define USER_REQ_TYP_NO_REQ           3
 #define SCHED_PERODICITY_MS           1
 
@@ -42,6 +42,7 @@ static void LCD_WriteStringProc();
 static void LCD_HelperWriteCommand(u8 Command);
 static void LCD_SetCursorProc();
 static void LCD_Operation();
+/* void LCD_WriteCommand(u8 Copy_u8Command); */
 //static void LCD_SendEnableSignal();
 void LCD_Init()
 {
@@ -64,7 +65,14 @@ void LCD_SetCursor(u8 Copy_u8Row, u8 Copy_u8Col)
 	}
 
 }
-void LCD_WriteCommand(u8 Copy_u8Command)
+void LCD_ClearDisplay()
+{
+		UserReq_t.Command = LCD_CLEAR_DISPLAY ;
+	    UserReq_t.Type =  USER_REQ_TYP_CLR_DIS;
+	    UserReq_t.State = USER_RQ_BUSY;
+
+}
+ /* void LCD_WriteCommand(u8 Copy_u8Command)
 {
    if(UserReq_t.State == USER_RQ_RDY && LCD_STATE == LCD_OPERATION_STATE)
 	{
@@ -72,7 +80,7 @@ void LCD_WriteCommand(u8 Copy_u8Command)
 	UserReq_t.Type = USER_REQ_TYP_WRITE_COMM;
 	UserReq_t.Command = Copy_u8Command ;
 	}
-}
+} */
 void LCD_WriteString(const char *Copy_AddStr, u8 len)
 {
 	if(UserReq_t.State == USER_RQ_RDY && LCD_STATE == LCD_OPERATION_STATE)
@@ -234,7 +242,7 @@ static void LCD_HelperWriteCommand(u8 Command)
 }
 static void LCD_WriteCharData(u8 Copy_Data)
 {
-	 if (Time_mS%2)
+	 if (Time_mS % 2)
 	{
 	 for (u8 i = 0 ; i < 8 ; i++)
 	 {
@@ -286,7 +294,7 @@ static void LCD_WriteCharData(u8 Copy_Data)
         }
         break;
 
-    case USER_REQ_TYP_WRITE_COMM:
+    case USER_REQ_TYP_CLR_DIS:
         if (Time_mS == 1)
         {
         	LCD_WriteCommandProc();

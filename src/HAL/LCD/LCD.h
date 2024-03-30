@@ -34,7 +34,7 @@ void LCD_Init();
 
 void LCD_GetStatus(u8 *LCD_Status);
 
-void LCD_WriteCommand(u8 Copy_u8Command);
+void LCD_ClearDisplay();
 
 
 void LCD_WriteString(const char *Copy_AddStr , u8 len);
