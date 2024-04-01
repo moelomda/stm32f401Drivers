@@ -168,7 +168,7 @@ UART_ErrorStatus_t UART_RxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
 UART_ErrorStatus_t UART_CallBackFunction(UART_Channel Channel, UART_enuMode_t Mode, Cb_t Add_CallBackFunction)
 {
    u8 Loc_ErrorStatus =UART_Succ;
-   if(!Add_CallBackFunction)
+   if(Add_CallBackFunction)
    {
       if(Mode == TxMode)
       {

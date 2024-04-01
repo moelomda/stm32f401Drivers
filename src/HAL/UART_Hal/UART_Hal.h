@@ -13,13 +13,13 @@
 
 
 
-void UART_HalInit(UART_Channel Channel);
-
+void UART_HalInit(UART_ConfigType* ConfigPtr);
+void UART_HalTxBufferZeroCopy(UART_Buff_t * Copy_UserBuff  );
+void UART_HalRxBufferAsync(UART_Buff_t * Copy_UserBuff );
 void UART_HalSendByteAsynch(UART_Channel Channel, u8 Copy_u8Data);
 
-void UART_HalRxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb );
 
-void UART_HalTxBufferZeroCopy(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb );
 
-void UART_HalCallBackFunction(UART_Channel Channel, UART_enuMode_t Mode, Cb_t Add_CallBackFunction);
+
+UART_ErrorStatus_t UART_CallBackFunction(UART_Channel Channel, UART_enuMode_t Mode, Cb_t Add_CallBackFunction);
 #endif /* UART_HAL_H_ */

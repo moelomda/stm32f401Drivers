@@ -25,7 +25,7 @@ GpioPinCfg_t UART_CH[6]=
   },
   [UART1_RX]=
   {
-		      .GPIO_Port =  PORT_A,
+		     .GPIO_Port =  PORT_A,
 			 .GPIO_Pin  =  GPIO_PIN_10,
 			 .GPIO_Direction =  GPIO_AF_M ,
 			 .GPIO_Mode =  GPIO_PULL_UP,
@@ -75,44 +75,55 @@ GpioPinCfg_t UART_CH[6]=
 
 
 };
-void UART_HalInit(UART_Channel Channel)
+void UART_HalInit(UART_ConfigType* ConfigPtr)
 {
-	 Rcc_SetPeripheralOnOff(GPIO_A , CLK_ON );
-	 Rcc_SetPeripheralOnOff(GPIO_C , CLK_ON );
-  if(Channel == UART1)
+
+
+  if(ConfigPtr->Channel == UART1)
   {
-     GPIO_Init(&UART_CH[UART1_TX]);
+	 Rcc_SetPeripheralOnOffAhp (GPIO_A , CLK_ON );
+	 Rcc_SetPeripheralOnOffAbp(USART1, CLK_ON );
+	 GPIO_Init(&UART_CH[UART1_TX]);
      GPIO_Init(&UART_CH[UART1_RX]);
      NVIC_IRQControl(NVIC_USART1_INTERRUPT, IRQ_ENABLE);
+
   }
-  else if (Channel == UART2)
+  else if (ConfigPtr->Channel== UART2)
   {
+	  Rcc_SetPeripheralOnOffAhp(GPIO_A , CLK_ON );
+	  Rcc_SetPeripheralOnOffAbp(USART2, CLK_ON );
 	  GPIO_Init(&UART_CH[UART2_TX]);
 	  GPIO_Init(&UART_CH[UART2_RX]);
 	  NVIC_IRQControl(NVIC_USART2_INTERRUPT, IRQ_ENABLE);
+
   }
-  else if (Channel == UART6)
+  else if (ConfigPtr->Channel == UART6)
   {
+
+	     Rcc_SetPeripheralOnOffAhp(GPIO_C , CLK_ON );
+	     Rcc_SetPeripheralOnOffAbp(USART6, CLK_ON );
 	     GPIO_Init(&UART_CH[UART6_TX]);
 	     GPIO_Init(&UART_CH[UART6_RX]);
 	     NVIC_IRQControl(NVIC_USART6_INTERRUPT, IRQ_ENABLE);
+
   }
   else
   {
 
   }
+  UART_Init(ConfigPtr);
 }
 void UART_HalSendByteAsynch(UART_Channel Channel, u8 Copy_u8Data)
 {
 	UART_SendByteAsynch( Channel, Copy_u8Data);
 }
-void UART_HalRxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
+void UART_HalRxBufferAsync(UART_Buff_t * Copy_UserBuff )
 {
-	UART_RxBufferAsync( Copy_Buffer ,  Copy_len ,  Cb )	;
+	UART_RxBufferAsync( Copy_UserBuff )	;
 }
-void UART_HalTxBufferZeroCopy(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
+void UART_HalTxBufferZeroCopy(UART_Buff_t * Copy_UserBuff  )
 {
-	 UART_TxBufferZeroCopy( Copy_Buffer , Copy_len ,  Cb );
+	 UART_TxBufferZeroCopy( Copy_UserBuff );
 }
 void UART_HalCallBackFunction(UART_Channel Channel, UART_enuMode_t Mode, Cb_t Add_CallBackFunction)
 {
