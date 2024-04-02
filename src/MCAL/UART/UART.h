@@ -52,15 +52,36 @@
 #define UART_RX_DISABLE   0
 #define UART_RX_ENABLE    1
 
+#define TX_MODE   0
+#define RX_MODE   1
 #define SYS_CLK     16000000
 typedef void(*Cb_t)(void);
-
 typedef enum
 {
     UART1 = 0,
     UART2,
     UART6
 } UART_Channel;
+typedef struct
+{
+  UART_Channel Channel;
+  u8 *data;
+  u32 pos ;
+  u32 size;
+}UART_Buff_t;
+typedef struct
+{
+	UART_Buff_t buff;
+    u8 State ;
+    Cb_t Cb;
+} UART_TxReqBuff_t;
+
+typedef struct
+{
+	UART_Buff_t buff;
+    u8 State ;
+    Cb_t Cb;
+} UART_RxReqBuff_t;
 
 typedef enum
 {
@@ -90,7 +111,7 @@ typedef struct
 
 typedef enum
 {
-   TxMode,
+   TxMode=0,
    RxMode,
 } UART_enuMode_t;
 
@@ -129,7 +150,7 @@ UART_ErrorStatus_t UART_SendByteAsynch(UART_Channel Channel, u8 Copy_u8Data);
 
     Return: Error status indicating success or failure.
 */
-UART_ErrorStatus_t UART_RxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb );
+UART_ErrorStatus_t UART_RxBufferAsync(UART_Buff_t * Copy_UserBuff );
 
 /*
     Function Name: 	UART_SendBufferZeroCopy
@@ -141,7 +162,7 @@ UART_ErrorStatus_t UART_RxBufferAsync(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb )
 
     Return: Error status indicating success or failure.
 */
-UART_ErrorStatus_t UART_TxBufferZeroCopy(u16 Copy_Buffer , u32 Copy_len , Cb_t Cb );
+UART_ErrorStatus_t UART_TxBufferZeroCopy(UART_Buff_t * Copy_UserBuff );
 
 /*
     Function Name: 	UART_RegisterCallBackFunction
@@ -155,6 +176,6 @@ UART_ErrorStatus_t UART_TxBufferZeroCopy(u16 Copy_Buffer , u32 Copy_len , Cb_t C
 
     Return: Error status indicating success or failure.
 */
-UART_ErrorStatus_t UART_CallBackFunction(UART_Channel Channel, UART_enuMode_t Mode, Cb_t Add_CallBackFunction);
+UART_ErrorStatus_t UART_CallBackFunction(UART_Channel Channel, u8 Mode, Cb_t Add_CallBackFunction);
 
 #endif /* UART_H_ */
