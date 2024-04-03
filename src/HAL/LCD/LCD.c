@@ -18,7 +18,7 @@
 
 #define ROW1   1
 #define ROW2   2
-u8 LCD_STATE ;
+u8 LCD_STATE = LCD_OFF_STATE;
 u8 LCD_LatchedEn = 0;
 u8 Time_mS = 0;
 extern LCD_Str_t LCD_config ;
@@ -42,8 +42,7 @@ static void LCD_WriteStringProc();
 static void LCD_HelperWriteCommand(u8 Command);
 static void LCD_SetCursorProc();
 static void LCD_Operation();
-/* void LCD_WriteCommand(u8 Copy_u8Command); */
-//static void LCD_SendEnableSignal();
+static u32 Calc_string_Len(const char *string);
 void LCD_Init()
 {
 	GPIO_Init(&LCD_config.LCD_StrRsReg);
@@ -67,32 +66,23 @@ void LCD_SetCursor(u8 Copy_u8Row, u8 Copy_u8Col)
 }
 void LCD_ClearDisplay()
 {
+	if(UserReq_t.State == USER_RQ_RDY && LCD_STATE == LCD_OPERATION_STATE){
 		UserReq_t.Command = LCD_CLEAR_DISPLAY ;
 	    UserReq_t.Type =  USER_REQ_TYP_CLR_DIS;
 	    UserReq_t.State = USER_RQ_BUSY;
-
-}
- /* void LCD_WriteCommand(u8 Copy_u8Command)
-{
-   if(UserReq_t.State == USER_RQ_RDY && LCD_STATE == LCD_OPERATION_STATE)
-	{
-	UserReq_t.State= USER_RQ_BUSY;
-	UserReq_t.Type = USER_REQ_TYP_WRITE_COMM;
-	UserReq_t.Command = Copy_u8Command ;
 	}
-} */
-void LCD_WriteString(const char *Copy_AddStr, u8 len)
+}
+void LCD_WriteString(const char *Copy_AddStr)
 {
 	if(UserReq_t.State == USER_RQ_RDY && LCD_STATE == LCD_OPERATION_STATE)
 		{
 		UserReq_t.State= USER_RQ_BUSY;
 		UserReq_t.Type= USER_REQ_TYP_WRITE_STR;
 		Write_Req.Str = Copy_AddStr;
-		Write_Req.len = len ;
+		Write_Req.len = Calc_string_Len(Copy_AddStr);
 		Write_Req.pos = 0;
 		}
 }
-
 void LCD_GetStatus(u8 *LCD_Status)
 {
 	*LCD_Status = LCD_STATE;
@@ -156,7 +146,6 @@ static void LCD_InitSm()
     	LCD_STATE = LCD_OPERATION_STATE;
     	UserReq_t.State= USER_RQ_RDY;
     	 Time_mS=0;
-    	//initstate
     break;
    }
 }
@@ -218,7 +207,6 @@ static void LCD_WriteCommandProc()
 		{
 	    LCD_LatchedEn = 1;
 		GPIO_SetPinValue(LCD_config.LCD_StrEnReg.GPIO_Port,LCD_config.LCD_StrEnReg.GPIO_Pin,LOGIC_LOW);
-/**/
 		}
 }
 
@@ -272,8 +260,8 @@ static void LCD_WriteCharData(u8 Copy_Data)
         }
         else
         {
-           UserReq_t.State = USER_RQ_RDY;
-           UserReq_t.Type  = USER_REQ_TYP_NO_REQ;
+             UserReq_t.State = USER_RQ_RDY;
+             UserReq_t.Type  = USER_REQ_TYP_NO_REQ;
         	 Write_Req.len=0;
         	 Write_Req.pos=0;
              Time_mS = 0;
@@ -302,12 +290,9 @@ static void LCD_WriteCharData(u8 Copy_Data)
         else if (Time_mS == 2)
         {
         	LCD_WriteCommandProc();
-        }
-        else if (Time_mS == 4)
-        {
         	UserReq_t.State = USER_RQ_RDY;
+        	UserReq_t.Type  = USER_REQ_TYP_NO_REQ;
             Time_mS = 0;
-            UserReq_t.Type  = USER_REQ_TYP_NO_REQ;
         }
         break;
 
@@ -315,5 +300,15 @@ static void LCD_WriteCharData(u8 Copy_Data)
     Time_mS = 0;
         break;
     }
-
 }
+ static u32 Calc_string_Len(const char *string)
+ {
+     const char *ptr = string;
+
+     while (*ptr)
+     {
+         ++ptr;
+     }
+
+     return (ptr - string);
+ }

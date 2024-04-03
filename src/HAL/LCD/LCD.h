@@ -37,7 +37,7 @@ void LCD_GetStatus(u8 *LCD_Status);
 void LCD_ClearDisplay();
 
 
-void LCD_WriteString(const char *Copy_AddStr , u8 len);
+void LCD_WriteString(const char *Copy_AddStr);
 
 
 void LCD_SetCursor(u8 Copy_u8Row, u8 Copy_u8Col);
